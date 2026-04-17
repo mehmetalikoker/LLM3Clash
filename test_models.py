@@ -2,7 +2,7 @@ import asyncio
 from anthropic import AsyncAnthropic
 
 async def test():
-    client = AsyncAnthropic(api_key="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")
+    client = AsyncAnthropic()
     try:
         message = await client.messages.create(
             model="claude-3-5-sonnet-20240620",

@@ -30,7 +30,7 @@ with st.sidebar:
 
 # --- API İstemcileri ---
 client_openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-client_claude = AsyncAnthropic(api_key="CLAUDE_API_KEY")
+client_claude = AsyncAnthropic(api_key=os.getenv("CLAUDE_API_KEY"))
 client_deepseek = AsyncOpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com/v1")
 
 
