@@ -1,16 +1,14 @@
-import asyncio
-from anthropic import AsyncAnthropic
+import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
-async def test():
-    client = AsyncAnthropic()
-    try:
-        message = await client.messages.create(
-            model="claude-3-5-sonnet-20240620",
-            max_tokens=10,
-            messages=[{"role": "user", "content": "Merhaba"}]
-        )
-        print("Bağlantı Başarılı:", message.content[0].text)
-    except Exception as e:
-        print("Hata devam ediyor:", e)
+load_dotenv()
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-asyncio.run(test())
+print("--- Erişimine Açık Modeller ---")
+try:
+    for m in genai.list_models():
+        if 'generateContent' in m.supported_generation_methods:
+            print(f"Model Adı: {m.name}")
+except Exception as e:
+    print(f"Hata oluştu: {e}")
