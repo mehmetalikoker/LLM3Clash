@@ -7,30 +7,23 @@ from openai import AsyncOpenAI
 import google.generativeai as genai
 from anthropic import AsyncAnthropic
 
-# 1. Ortam Değişkenlerini Yükle
 load_dotenv()
 
-# 2. Sayfa Yapılandırması
 st.set_page_config(page_title="LLM 3 Clash (Normal)", layout="wide")
 st.title("🌌 LLM 3 Clash")
 
-# --- SIDEBAR: Model Seçimleri ---
+
 with st.sidebar:
     st.header("⚙️ Model Seçimleri")
     oa_model = st.selectbox("OpenAI Modeli", ["gpt-4o-mini", "gpt-4o"], index=0)
     ds_model = st.selectbox("DeepSeek Modeli", ["deepseek-chat", "deepseek-coder"], index=0)
-    ge_model = st.sidebar.selectbox(
-        "Gemini Modeli",
-        ["models/gemini-2.5-pro-preview-tts"],
-        index=0
-    )
-    ca_model = st.selectbox("Claude Modeli", ["claude-3-5-sonnet-20240620"], index=0)
+    # ge_model = st.sidebar.selectbox("Gemini Modeli",["models/gemini-2.5-pro-preview-tts"],index=0)
+    ca_model = st.selectbox("Claude Modeli", ["claude-sonnet-4-6"], index=0)
 
 
 
-# --- API İstemcileri ---
 client_openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-client_claude = AsyncAnthropic(api_key=os.getenv("CLAUDE_API_KEY"))
+client_claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 client_deepseek = AsyncOpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com/v1")
 
 
@@ -70,16 +63,14 @@ import asyncio
 
 
 
-# İstemciyi fonksiyon dışında tanımladığını varsayıyorum
-# client_claude = AsyncAnthropic(api_key="API_KEY")
 
-async def ask_claude(prompt, container, model_name="claude-3-5-sonnet-20240620"):
+async def ask_claude(prompt, container, model_name="claude-sonnet-4-6"):
     start_time = time.time()
     try:
         response = await client_claude.messages.create(
             model=model_name,
             max_tokens=1024,
-            system="Sen yardımcı bir asistansın. Türkçe cevap ver.",  # Sistem mesajı parametresi
+            system="Sen yardımcı bir asistansın. Türkçe cevap ver.",
             messages=[
                 {"role": "user", "content": prompt}
             ]
@@ -119,15 +110,13 @@ async def ask_deepseek(prompt, container, model_name):
         return None
 
 
-import httpx  # Eğer yüklü değilse terminale: pip install httpx
+import httpx
 
 
 async def ask_gemini(prompt, container, model_name):
     start_time = time.time()
     api_key = os.getenv("GEMINI_API_KEY")
 
-    # v1beta yerine v1 kullanarak doğrudan URL oluşturuyoruz
-    # Modeli 'gemini-1.5-flash' olarak sadeleştiriyoruz
     clean_model_name = model_name.replace("models/", "").replace("-latest", "")
     url = f"https://generativelanguage.googleapis.com/v1/models/{clean_model_name}:generateContent?key={api_key}"
 
@@ -154,6 +143,8 @@ async def ask_gemini(prompt, container, model_name):
     except Exception as e:
         container.error(f"Bağlantı Hatası: {e}")
         return None
+
+
 
 # --- Arayüz Kontrolü ---
 prompt = st.text_area("Sorunu yaz:", placeholder="Yarışmayı başlatmak için bir şeyler yaz...")
