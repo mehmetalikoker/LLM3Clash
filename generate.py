@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
 import google.generativeai as genai
+from anthropic import AsyncAnthropic
 
 # 1. Ortam Değişkenlerini Yükle
 load_dotenv()
@@ -23,19 +24,25 @@ with st.sidebar:
         ["models/gemini-2.5-pro-preview-tts"],
         index=0
     )
+    ca_model = st.selectbox("Claude Modeli", ["claude-3-5-sonnet-20240620"], index=0)
+
+
 
 # --- API İstemcileri ---
 client_openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client_claude = AsyncAnthropic(api_key="CLAUDE_API_KEY")
 client_deepseek = AsyncOpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com/v1")
-import google.generativeai as genai
 
+
+
+import google.generativeai as genai
 genai.configure(
     api_key=os.getenv("GEMINI_API_KEY"),
-    transport='rest' # Bazen gRPC bağlantısı da bu hataya neden olabilir, 'rest' daha garantidir
+    transport='rest'
 )
 
 
-# --- Normal (Streaming Olmayan) Fonksiyonlar ---
+
 
 async def ask_openai(prompt, container, model_name):
     start_time = time.time()
@@ -55,6 +62,41 @@ async def ask_openai(prompt, container, model_name):
     except Exception as e:
         container.error(f"OpenAI Hatası: {e}")
         return None
+
+
+
+import time
+import asyncio
+
+
+
+# İstemciyi fonksiyon dışında tanımladığını varsayıyorum
+# client_claude = AsyncAnthropic(api_key="API_KEY")
+
+async def ask_claude(prompt, container, model_name="claude-3-5-sonnet-20240620"):
+    start_time = time.time()
+    try:
+        response = await client_claude.messages.create(
+            model=model_name,
+            max_tokens=1024,
+            system="Sen yardımcı bir asistansın. Türkçe cevap ver.",  # Sistem mesajı parametresi
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        duration = time.time() - start_time
+        answer = response.content[0].text
+
+        # Yanıtı anında ilgili Streamlit sütununa basar
+        container.markdown(answer)
+
+        return duration
+
+    except Exception as e:
+        container.error(f"Claude Hatası: {e}")
+        return None
+
 
 
 async def ask_deepseek(prompt, container, model_name):
@@ -137,13 +179,13 @@ if st.button("Savaşı Başlat 🚀"):
             results = await asyncio.gather(
                 ask_openai(prompt, c1, oa_model),
                 ask_deepseek(prompt, c2, ds_model),
-                ask_gemini(prompt, c3, ge_model)
+                ask_claude(prompt, c3, ca_model)
             )
 
             # Sonuçlar geldiğinde kutuları temizle ve süreyi yaz
             if results[0]: m1.metric(f"⏱️ {oa_model}", f"{results[0]:.2f}s")
             if results[1]: m2.metric(f"⏱️ {ds_model}", f"{results[1]:.2f}s")
-            if results[2]: m3.metric(f"⏱️ {ge_model}", f"{results[2]:.2f}s")
+            if results[2]: m3.metric(f"⏱️ {ca_model}", f"{results[2]:.2f}s")
 
 
         asyncio.run(run_battle())
