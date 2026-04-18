@@ -4,8 +4,8 @@ import time
 import os
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
-import google.generativeai as genai
 from anthropic import AsyncAnthropic
+import httpx
 
 load_dotenv()
 
@@ -27,16 +27,7 @@ client_claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 client_deepseek = AsyncOpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com/v1")
 
 
-
-import google.generativeai as genai
-genai.configure(
-    api_key=os.getenv("GEMINI_API_KEY"),
-    transport='rest'
-)
-
-
-
-
+# OpenAI Main Method
 async def ask_openai(prompt, container, model_name):
     start_time = time.time()
     try:
@@ -46,7 +37,7 @@ async def ask_openai(prompt, container, model_name):
                 {"role": "system", "content": "Sen yardımcı bir asistansın. Türkçe cevap ver."},
                 {"role": "user", "content": prompt}
             ],
-            stream=False  # Streaming kapalı
+            stream=False
         )
         duration = time.time() - start_time
         answer = response.choices[0].message.content
@@ -58,12 +49,7 @@ async def ask_openai(prompt, container, model_name):
 
 
 
-import time
-import asyncio
-
-
-
-
+# Claude Main Method
 async def ask_claude(prompt, container, model_name="claude-sonnet-4-6"):
     start_time = time.time()
     try:
@@ -75,21 +61,17 @@ async def ask_claude(prompt, container, model_name="claude-sonnet-4-6"):
                 {"role": "user", "content": prompt}
             ]
         )
-
         duration = time.time() - start_time
         answer = response.content[0].text
-
-        # Yanıtı anında ilgili Streamlit sütununa basar
         container.markdown(answer)
-
         return duration
-
     except Exception as e:
         container.error(f"Claude Hatası: {e}")
         return None
 
 
 
+# DeepSeek Main Method
 async def ask_deepseek(prompt, container, model_name):
     start_time = time.time()
     try:
@@ -110,9 +92,9 @@ async def ask_deepseek(prompt, container, model_name):
         return None
 
 
-import httpx
 
 
+# Gemini Main Method
 async def ask_gemini(prompt, container, model_name):
     start_time = time.time()
     api_key = os.getenv("GEMINI_API_KEY")
@@ -125,7 +107,6 @@ async def ask_gemini(prompt, container, model_name):
             "parts": [{"text": prompt}]
         }]
     }
-
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(url, json=payload, timeout=30.0)
@@ -146,7 +127,7 @@ async def ask_gemini(prompt, container, model_name):
 
 
 
-# --- Arayüz Kontrolü ---
+# UI Binding
 prompt = st.text_area("Sorunu yaz:", placeholder="Yarışmayı başlatmak için bir şeyler yaz...")
 
 if st.button("Savaşı Başlat 🚀"):
@@ -155,7 +136,7 @@ if st.button("Savaşı Başlat 🚀"):
     else:
         col1, col2, col3 = st.columns(3)
 
-        # Metrikler ve İçerik Alanları
+
         m1, m2, m3 = col1.empty(), col2.empty(), col3.empty()
         c1 = col1.container(height=400)
         c2 = col2.container(height=400)
