@@ -1,9 +1,10 @@
 # What's LLM3Clash Project
-With the LLM3Clash project, we obtain simultaneous responses from three different AI models—OpenAI, DeepSeek, and Claude—for every prompt. This allows us to benchmark and compare these AI models based on their response quality and processing speed
+With the LLM3Clash project, we obtain simultaneous responses from three different AI models OpenAI, DeepSeek, and Claude for every prompt. This allows us to benchmark and compare these AI models based on their response quality and processing speed
 
 ## 🎨 How Does It Look
 
-![Ekran görüntüsü 2026-04-18 104914.png](../../Desktop/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-04-18%20104914.png)
+<img width="1855" height="889" alt="Ekran görüntüsü 2026-04-18 104914" src="https://github.com/user-attachments/assets/ceb24342-b3b6-4228-a1c6-56eb91c5ae68" />
+
 
 ## 🖥️ Installation
 1) Clone the repository:
