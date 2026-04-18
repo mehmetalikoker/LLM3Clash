@@ -17,8 +17,7 @@ with st.sidebar:
     st.header("⚙️ Model Seçimleri")
     oa_model = st.selectbox("OpenAI Modeli", ["gpt-4o-mini", "gpt-4o"], index=0)
     ds_model = st.selectbox("DeepSeek Modeli", ["deepseek-chat", "deepseek-coder"], index=0)
-    # ge_model = st.sidebar.selectbox("Gemini Modeli",["models/gemini-2.5-pro-preview-tts"],index=0)
-    ca_model = st.selectbox("Claude Modeli", ["claude-sonnet-4-6"], index=0)
+    ca_model = st.selectbox("Claude Modeli", ["claude-sonnet-4-6","claude-opus-4-7","claude-opus-4-6"], index=0)
 
 
 
