@@ -130,22 +130,25 @@ async def ask_gemini(prompt, container, model_name):
 # UI Binding
 prompt = st.text_area("Sorunu yaz:", placeholder="Yarışmayı başlatmak için bir şeyler yaz...")
 
-if st.button("Savaşı Başlat 🚀"):
+if st.button("Savaş Başlasın 🚀"):
     if not prompt:
         st.warning("Bir soru girmelisin!")
     else:
         col1, col2, col3 = st.columns(3)
 
-
         m1, m2, m3 = col1.empty(), col2.empty(), col3.empty()
+
+        status1 = col1.empty()
+        status2 = col2.empty()
+        status3 = col3.empty()
+
         c1 = col1.container(height=400)
         c2 = col2.container(height=400)
         c3 = col3.container(height=400)
 
-        c1.info("Bekleniyor...")
-        c2.info("Bekleniyor...")
-        c3.info("Bekleniyor...")
-
+        status1.info("Bekleniyor")
+        status2.info("Bekleniyor")
+        status3.info("Bekleniyor")
 
         async def run_battle():
             results = await asyncio.gather(
@@ -154,10 +157,16 @@ if st.button("Savaşı Başlat 🚀"):
                 ask_claude(prompt, c3, ca_model)
             )
 
-            # Sonuçlar geldiğinde kutuları temizle ve süreyi yaz
-            if results[0]: m1.metric(f"⏱️ {oa_model}", f"{results[0]:.2f}s")
-            if results[1]: m2.metric(f"⏱️ {ds_model}", f"{results[1]:.2f}s")
-            if results[2]: m3.metric(f"⏱️ {ca_model}", f"{results[2]:.2f}s")
-
+            if results[0]: m1.metric(f"⏱️ OPENAI Süresi", f"{results[0]:.2f}s")
+            if results[1]: m2.metric(f"⏱️ DEEPSEEK Süresi", f"{results[1]:.2f}s")
+            if results[2]: m3.metric(f"⏱️ CLAUDE Süresi", f"{results[2]:.2f}s")
 
         asyncio.run(run_battle())
+
+        status1.empty()
+        status2.empty()
+        status3.empty()
+
+        status1.success("Tamamlandı")
+        status2.success("Tamamlandı")
+        status3.success("Tamamlandı")
