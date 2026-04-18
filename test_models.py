@@ -1,29 +1,26 @@
-import google.generativeai as genai
+
 import os
 from dotenv import load_dotenv
+from anthropic import AsyncAnthropic
+import asyncio
+
 
 load_dotenv()
-genai.configure(api_key=os.getenv("ANTHROPIC_API_KEY"))
+client_claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 print("--- Erişimine Açık Modeller ---")
-try:
-    for m in genai.list_models():
-        if 'generateContent' in m.supported_generation_methods:
-            print(f"Model Adı: {m.name}")
-except Exception as e:
-    print(f"Hata oluştu: {e}")
+async def list_models():
+    try:
+        # await şimdi çalışacaktır
+        models = await client_claude.models.list()
+
+        async for model in models:
+            print(f"Model ID: {model.id}")
+    except Exception as e:
+        print(f"Hata: {e}")
 
 
-
-import anthropic
-
-client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-
-message = client.messages.create(
-    model="claude-opus-4-5",
-    max_tokens=100,
-    messages=[{"role": "user", "content": "Merhaba!"}]
-)
-print(message.content)
-
+# 2. Bu fonksiyonu asyncio ile çalıştır
+if __name__ == "__main__":
+    asyncio.run(list_models())
 
