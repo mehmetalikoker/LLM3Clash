@@ -4,6 +4,10 @@ With the LLM3Clash project, we obtain simultaneous responses from three differen
 ## 🎨 How Does It Look
 
 <img width="1855" height="889" alt="Ekran görüntüsü 2026-04-18 104914" src="https://github.com/user-attachments/assets/ceb24342-b3b6-4228-a1c6-56eb91c5ae68" />
+<br>
+<br>
+<br>
+<img width="1390" height="1095" alt="image" src="https://github.com/user-attachments/assets/e8f12558-c948-4df0-9099-97054189b038" />
 
 
 ## 🖥️ Installation
